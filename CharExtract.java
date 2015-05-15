@@ -2,7 +2,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
-// TODO: Auto-generated Javadoc
 public class CharExtract {
 
 	private ArrayList<Tile> tiles;
@@ -28,10 +27,11 @@ public class CharExtract {
 		int[][] pixels = picture.getGrayscale();
 		double t = getThreshold(pixels);
 
+		// creating masks associated with tiles, adding to tiles ArrayList
 		for (int row = 0; row < pixels.length; row++) {
 			for (int col = 0; col < pixels[row].length; col++) {
 				if (pixels[row][col] > t && !withinTiles(row, col)) {
-					tiles.add(getTile(pixels, t, row, col));
+					tiles.add( new Tile( new Mask(col, row, t, pixels) ) );
 				}
 			}
 		}
@@ -49,7 +49,7 @@ public class CharExtract {
 	 */
 	private boolean withinTiles(int row, int col) {
 		for (Tile t : tiles) {
-			if (t.withinTile(col, row)) // x and y
+			if (t.contains(col, row)) // x and y
 			{
 				return true;
 			}
@@ -66,31 +66,13 @@ public class CharExtract {
 	 */
 	private double getThreshold(int[][] pixels) {
 		int t = 0;
+		int[] bin = new int[256];
 		for (int[] pixel : pixels) {
 			for (int element : pixel) {
-
+				
 			}
 		}
 		return t;
 	}
-
-	/**
-	 * Gets the tile.
-	 *
-	 * @param pixels
-	 *            the pixels
-	 * @param threshold
-	 *            the threshold
-	 * @param x
-	 *            the x
-	 * @param y
-	 *            the y
-	 * @return the tile
-	 */
-	private Tile getTile(int[][] pixels, double threshold, int x, int y) {
-		Mask m = new Mask(x, y, threshold, pixels);
-
-		return new Tile();
-	}
-
+	
 }

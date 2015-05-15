@@ -1,4 +1,5 @@
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -28,8 +29,8 @@ public class Mask {
 	 *            the pixels
 	 */
 	public Mask(int col, int row, double t, int pixels[][]) {
-		x = row;
-		y = col;
+		x = col;
+		y = row;
 		threshold = t;
 		dilateMask(pixels);
 	}
@@ -53,13 +54,13 @@ public class Mask {
 			addPossiblePoints();
 			
 			// remove points not above threshold
-			Iterator<Point> p1 = points.iterator();
-			while( p1.hasNext() )
+			Iterator<Point> pIterator = points.iterator();
+			while( pIterator.hasNext() )
 			{
-				Point p = p1.next();
+				Point p = pIterator.next();
 				if( pixels[p.y][p.x] < threshold )
 				{
-					p1.remove();
+					pIterator.remove();
 				}
 			}
 		}
@@ -85,6 +86,33 @@ public class Mask {
 	/**
 	 * Return a rectangle for the tile
 	 */
-	
+	public Rectangle getTile()
+	{
+		Iterator<Point> pIterator = points.iterator();
+		Point p = pIterator.next();
+		int x = p.x , x1 = p.x;
+		int y = p.y , y1 = p.y;
+		while( pIterator.hasNext() )
+		{
+			p = pIterator.next();
+			if( p.x > x1 )
+			{
+				x1 = p.x;
+			}
+			if( p.y > y1 )
+			{
+				y1 = p.y;
+			}
+			if( p.x < x )
+			{
+				x = p.x;
+			}
+			if( p.y < y )
+			{
+				y = p.y;
+			}
+		}
+		return new Rectangle( x , y , x1 , y1 );
+	}
 	
 }
