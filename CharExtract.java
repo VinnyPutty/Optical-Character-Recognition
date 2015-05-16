@@ -65,14 +65,82 @@ public class CharExtract {
 	 * @return the threshold
 	 */
 	private double getThreshold(int[][] pixels) {
-		int t = 0;
+		// initialize
+		double t = 0;
+
+		// create histogram and weights of intensities
 		int[] bin = new int[256];
 		for (int[] pixel : pixels) {
 			for (int element : pixel) {
-				
+				bin[element]++;
 			}
 		}
+		int[] weight = new int[256];
+		for( int i = 0; i < 256; i++ )
+		{
+			weight[i] = bin[i] * (i + 1);
+		}
+
+		// balanced histogram thresholding
+		// average intensity
+		int aMean = Math.round( partialArraySum(weight, 0, 255)/
+				partialArraySum(bin, 0, 255) );
+		// find means below and above the average intensity
+		double lMean = partialArraySum(weight, 0, aMean)/
+				partialArraySum(bin, 0, 255);
+		double hMean = partialArraySum(weight, aMean, 0)/
+				partialArraySum(bin, aMean, 0);
+		int temp = aMean;
+		aMean = (int) Math.round( ( lMean + hMean ) / 2 );
+
+		// iterate until upper and lower averages are the same
+		while( Math.abs( temp - aMean ) >= 1 )
+		{
+			temp = aMean;
+			lMean = partialArraySum(weight, 0, aMean)/
+					partialArraySum(bin, 0, 255);
+			hMean = partialArraySum(weight, aMean, 0)/ 
+					partialArraySum(bin, aMean, 0);
+			aMean = (int) Math.round( ( lMean + hMean ) / 2 );
+		}
+		// calculate t from balanced intensity
+		t = ( aMean - 1.0 ) / ( 256 );
 		return t;
 	}
-	
+
+	/**
+	 * Gets the partial array sum.
+	 *
+	 * @param a
+	 *            the array
+	 * @param s
+	 * 			  the start index
+	 * @param e
+	 * 			  the end index
+	 * @return the partial array sum
+	 */
+	private int partialArraySum( int[] a , int s , int e )
+	{
+		int sum = 0;
+		for( int i = s; i <= e; i++ )
+		{
+			sum += a[i];
+		}
+		return sum;
+	}
+
+	// create strings from tiles
+	public String charBuilder()
+	{
+		StringBuilder s = new StringBuilder();
+
+		return s.toString();
+	}
+
+	private char charExtract( Tile t )
+	{
+
+
+	}
+
 }

@@ -5,10 +5,9 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-// TODO: Auto-generated Javadoc
 public class Picture {
 
-	BufferedImage image;
+	private BufferedImage image;
 
 	/**
 	 * Instantiates a new picture.

@@ -1,6 +1,5 @@
 import java.awt.Rectangle;
 
-
 public class Tile extends Rectangle {
 
 	private Mask mask;
