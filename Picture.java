@@ -68,4 +68,20 @@ public class Picture {
 		return result;
 	}
 
+	public int[][] getGrayscaleSimple() {
+		final int[][] pixels = new int[image.getHeight()][image.getWidth()];
+
+		for (int i = 0; i < image.getHeight(); i++) {
+			for (int j = 0; j < image.getWidth(); j++) {
+				int clr = image.getRGB(i, j);
+				int red = (clr & 0x00ff0000) >> 16;
+			int green = (clr & 0x0000ff00) >> 8;
+				int blue = clr & 0x000000ff;
+				pixels[i][j] = (red + green + blue) / 3;
+			}
+		}
+
+		return pixels;
+	}
+
 }

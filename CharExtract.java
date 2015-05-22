@@ -24,14 +24,18 @@ public class CharExtract {
 	public CharExtract(File img) throws IOException {
 		picture = new Picture(img.getAbsolutePath());
 		createTiles();
+		tileSave();
 	}
 
 	/**
 	 * Creates the tiles.
 	 */
 	public void createTiles() {
-		int[][] pixels = picture.getGrayscale();
-		double t = getThreshold(pixels);
+		tiles = new ArrayList<Tile>();
+
+		int[][] pixels = picture.getGrayscaleSimple();
+		// double t = getThreshold(pixels);
+		double t = 50;
 
 		// creating masks associated with tiles, adding to tiles ArrayList
 		for (int row = 0; row < pixels.length; row++) {
@@ -41,6 +45,7 @@ public class CharExtract {
 				}
 			}
 		}
+		System.out.println(tiles.size());
 
 	}
 
