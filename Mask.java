@@ -8,14 +8,14 @@ public class Mask {
 	// starting point of mask
 	private int x;
 	private int y;
-	
+
 	private double threshold;
 	private Set<Point> points;
 
 	// direction arrays
-	private int[] dX = {-1,0,1};
-	private int[] dY = {-1,0,1};
-	
+	private int[] dX = { -1, 0, 1 };
+	private int[] dY = { -1, 0, 1 };
+
 	/**
 	 * Instantiates a new mask.
 	 *
@@ -44,40 +44,42 @@ public class Mask {
 	private void dilateMask(int[][] pixels) {
 		// initialize variables
 		points = new HashSet<>();
-		points.add(new Point(x,y));
-		
+		points.add(new Point(x, y));
+
 		// iterate until amount of new points added to mask is insignificant
 		int size = 1;
-		while( 1.0 * points.size() - size / size > 0.05 )
-		{
+		while (1.0 * points.size() - size / size > 0.05) {
 			size = points.size();
 			addPossiblePoints();
-			
+
 			// remove points not above threshold
 			Iterator<Point> pIterator = points.iterator();
-			while( pIterator.hasNext() )
-			{
+			while (pIterator.hasNext()) {
 				Point p = pIterator.next();
-				if( pixels[p.y][p.x] < threshold )
-				{
+				if (pixels[p.y][p.x] < threshold) {
 					pIterator.remove();
 				}
 			}
 		}
-		
+
+	}
+
+	public Set<Point> getPoints() {
+		return points;
+	}
+
+	public void setPoints(Set<Point> points) {
+		this.points = points;
 	}
 
 	/**
 	 * Find surrounding pixels of the Set of points
 	 */
 	private void addPossiblePoints() {
-		for( Point p : points )
-		{
-			for( int i : dX )
-			{
-				for( int j : dY )
-				{
-					points.add( new Point( p.x + dX[i] , p.y + dY[j] ) );
+		for (Point p : points) {
+			for (int i : dX) {
+				for (int j : dY) {
+					points.add(new Point(p.x + dX[i], p.y + dY[j]));
 				}
 			}
 		}
@@ -86,33 +88,27 @@ public class Mask {
 	/**
 	 * Return a rectangle for the tile
 	 */
-	public Rectangle getTile()
-	{
+	public Rectangle getTile() {
 		Iterator<Point> pIterator = points.iterator();
 		Point p = pIterator.next();
-		int x = p.x , x1 = p.x;
-		int y = p.y , y1 = p.y;
-		while( pIterator.hasNext() )
-		{
+		int x = p.x, x1 = p.x;
+		int y = p.y, y1 = p.y;
+		while (pIterator.hasNext()) {
 			p = pIterator.next();
-			if( p.x > x1 )
-			{
+			if (p.x > x1) {
 				x1 = p.x;
 			}
-			if( p.y > y1 )
-			{
+			if (p.y > y1) {
 				y1 = p.y;
 			}
-			if( p.x < x )
-			{
+			if (p.x < x) {
 				x = p.x;
 			}
-			if( p.y < y )
-			{
+			if (p.y < y) {
 				y = p.y;
 			}
 		}
-		return new Rectangle( x , y , x1 , y1 );
+		return new Rectangle(x, y, x1, y1);
 	}
-	
+
 }

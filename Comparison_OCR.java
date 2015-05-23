@@ -19,7 +19,7 @@ public class Comparison_OCR {
 	}
 
 	/**
-	 * Sets the lookand feel.
+	 * Sets the look and feel.
 	 */
 	private static void setLookandFeel() {
 		try {
