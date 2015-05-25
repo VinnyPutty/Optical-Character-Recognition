@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 
 import javax.imageio.ImageIO;
@@ -34,8 +35,8 @@ public class CharExtract {
 		tiles = new ArrayList<Tile>();
 
 		int[][] pixels = picture.getGrayscaleSimple();
-		// double t = getThreshold(pixels);
-		double t = 50;
+		double t = getThreshold(pixels);
+		// double t = 50;
 
 		// creating masks associated with tiles, adding to tiles ArrayList
 		for (int row = 0; row < pixels.length; row++) {
@@ -133,11 +134,35 @@ public class CharExtract {
 
 	// create strings from tiles
 	public String charBuilder() {
+		// sort tiles
+		Collections.sort( tiles );
+		checkIJ();
+		
+		// build char
 		StringBuilder s = new StringBuilder();
+		
+		Iterator tileIterator = tiles.iterator();
+		Tile tile = (Tile) tileIterator.next();
+		
+		while( tileIterator.hasNext() )
+		{
+			s.append( charExtract( tile ) );
+		}
 
 		return s.toString();
 	}
 
+	private void checkIJ()
+	{
+		Iterator tileIterator = tiles.iterator();
+		Tile tile = (Tile) tileIterator.next();
+		
+		while( tileIterator.hasNext() )
+		{
+			
+		}
+	}
+	
 	private char charExtract(Tile t) {
 
 		return ' ';
@@ -159,7 +184,6 @@ public class CharExtract {
 			try {
 				ImageIO.write(image, "png", new File(i + ".png"));
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
