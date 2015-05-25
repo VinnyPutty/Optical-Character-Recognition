@@ -46,7 +46,7 @@ public class GUI {
 	 */
 	public GUI() {
 		this.mainFrame = new JFrame("Optical Character Recognition");
-		this.mainFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		this.mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		this.CharExtractionPanel = new JPanel();
 		// this.CharExtractionPanel.setLayout(new BoxLayout(CharExtractionPanel,

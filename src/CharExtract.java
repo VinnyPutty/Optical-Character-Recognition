@@ -10,6 +10,8 @@ import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 
+import org.imgscalr.Scalr;
+
 public class CharExtract {
 
 	private ArrayList<Tile> tiles;
@@ -238,6 +240,8 @@ public class CharExtract {
 			// }
 
 			writer.close();
+
+			image = Scalr.resize(image, 100);
 
 			try {
 				ImageIO.write(image, "png", new File(i + ".png"));
