@@ -108,7 +108,7 @@ public class Mask {
 				y = p.y;
 			}
 		}
-		return new Rectangle(x, y, x1, y1);
+		return new Rectangle(x, y, x1-x, y1-y);
 	}
 
 }
