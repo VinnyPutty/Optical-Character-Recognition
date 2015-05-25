@@ -1,81 +1,45 @@
-import java.util.ArrayList;
+import java.awt.Point;
+import java.awt.Rectangle;
 
 public class Tile {
 
-	private int x;
-	private int y;
-	private int height;
-	private int length;
-
 	private Mask mask;
-	
-	/**
-	 * @return the x
-	 */
-	public int getX() {
-		return x;
+	private Rectangle rectangle;
+
+	public Tile(Mask m) {
+		mask = m;
+
+		int x = m.getPoints().get(0).x, x1 = m.getPoints().get(0).x;
+		int y = m.getPoints().get(0).y, y1 = m.getPoints().get(0).y;
+		for (Point p : m.getPoints()) {
+			if (p.x > x1) x1 = p.x;
+			if (p.y > y1) y1 = p.y;
+			if (p.x < x) x = p.x;
+			if (p.y < y) y = p.y;
+		}
+
+		rectangle = new Rectangle(x, y, x1 - x, y1 - y);
+
 	}
 
-	/**
-	 * @return the y
-	 */
-	public int getY() {
-		return y;
+	public Rectangle getRectangle() {
+		return rectangle;
 	}
 
-	/**
-	 * @return the height
-	 */
-	public int getHeight() {
-		return height;
+	public void setRectangle(Rectangle rectangle) {
+		this.rectangle = rectangle;
 	}
 
-	/**
-	 * @return the length
-	 */
-	public int getLength() {
-		return length;
+	public Rectangle getRectangle(Mask m) {
+		return new Rectangle();
 	}
 
-
-
-	/**
-	 * @param x the x to set
-	 */
-	public void setX(int x) {
-		this.x = x;
+	public Mask getMask() {
+		return mask;
 	}
 
-
-
-	/**
-	 * @param y the y to set
-	 */
-	public void setY(int y) {
-		this.y = y;
+	public void setMask(Mask mask) {
+		this.mask = mask;
 	}
 
-
-
-	/**
-	 * @param height the height to set
-	 */
-	public void setHeight(int height) {
-		this.height = height;
-	}
-
-	/**
-	 * @param length the length to set
-	 */
-	public void setLength(int length) {
-		this.length = length;
-	}
-
-	
-
-	public boolean withinTile( int col , int row )
-	{
-		return x + length >= col && col >= x && y + height >= row && row >= y;
-	}
-	
 }
