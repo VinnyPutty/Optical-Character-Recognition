@@ -2,9 +2,11 @@ import java.awt.Color;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import javax.imageio.ImageIO;
 
@@ -12,6 +14,7 @@ public class CharExtract {
 
 	private ArrayList<Tile> tiles;
 	private Picture picture;
+	private int[][] pixels;
 
 	/**
 	 * Instantiates a new char extract.
@@ -25,6 +28,7 @@ public class CharExtract {
 		picture = new Picture(img.getAbsolutePath());
 		createTiles();
 		tileSave();
+		System.out.println("Complete.");
 	}
 
 	/**
@@ -33,19 +37,70 @@ public class CharExtract {
 	public void createTiles() {
 		tiles = new ArrayList<Tile>();
 
-		int[][] pixels = picture.getGrayscaleSimple();
+		// pixels = picture.getGrayscaleSimplest();
+		pixels = picture.getGrayscaleSimplest();
+
+		// int sum = 0;
+		//
+		// for (int[] i : pixels) {
+		// for (int j : i) {
+		// if (j <= 30) sum++;
+		// }
+		// }
+
+		// System.out.println(sum);
+
 		// double t = getThreshold(pixels);
-		double t = 50;
+		double t = 30;
 
 		// creating masks associated with tiles, adding to tiles ArrayList
 		for (int row = 0; row < pixels.length; row++) {
 			for (int col = 0; col < pixels[row].length; col++) {
-				if (pixels[row][col] > t && !withinTiles(row, col)) {
+
+				if (pixels[row][col] <= t && !withinTiles(row, col)) {
+
 					tiles.add(new Tile(new Mask(col, row, t, pixels)));
+
+					// System.out.flush();
+					//
+					// System.out.println(sum);
+					//
+					// for (Tile tile : tiles) {
+					// System.out.println(String.valueOf(tile.getRectangle().getLocation().x)
+					// + " " +
+					// String.valueOf(tile.getRectangle().getLocation().y) + " "
+					// + String.valueOf(tile.getRectangle().getLocation().x +
+					// (int) tile.getRectangle().getWidth()) + " " +
+					// String.valueOf(tile.getRectangle().getLocation().y +
+					// (int) tile.getRectangle().getHeight()) + " is tile #");
+					// }
+					//
+					// System.out.println(tiles.size());
+
+					// BufferedImage orig = picture.getImage();
+					//
+					// Graphics g = orig.getGraphics();
+					//
+					// g.setColor(Color.RED);
+					//
+					// g.drawRect(tiles.get(tiles.size() -
+					// 1).getRectangle().getLocation().x, tiles.get(tiles.size()
+					// - 1).getRectangle().getLocation().y, (int)
+					// tiles.get(tiles.size() - 1).getRectangle().getWidth(),
+					// (int) tiles.get(tiles.size() -
+					// 1).getRectangle().getHeight());
+					//
+					// try {
+					// ImageIO.write(orig, "png", new File("traced" +
+					// tiles.size() + ".png"));
+					// } catch (IOException e) {
+					// // TODO Auto-generated catch block
+					// e.printStackTrace();
+					// }
+
 				}
 			}
 		}
-		System.out.println(tiles.size());
 
 	}
 
@@ -59,11 +114,9 @@ public class CharExtract {
 	 * @return true, if successful
 	 */
 	private boolean withinTiles(int row, int col) {
+
 		for (Tile t : tiles) {
-			if (t.contains(col, row)) // x and y
-			{
-				return true;
-			}
+			if ((t.getRectangle().getLocation().x <= col && col <= t.getRectangle().getWidth() + t.getRectangle().getLocation().x) && (t.getRectangle().getLocation().y <= row && row <= t.getRectangle().getHeight() + t.getRectangle().getLocation().y)) return true;
 		}
 		return false;
 	}
@@ -144,17 +197,47 @@ public class CharExtract {
 	}
 
 	private void tileSave() {
+
+		BufferedImage orig = null;
+
 		for (int i = 0; i < tiles.size(); i++) {
-			BufferedImage image = new BufferedImage((int) tiles.get(i).getHeight(), (int) tiles.get(i).getWidth(), BufferedImage.TYPE_BYTE_GRAY);
 
-			Iterator<Point> it = tiles.get(i).getMask().getPoints().iterator();
+			BufferedImage image = new BufferedImage((int) tiles.get(i).getRectangle().getWidth() + 1, (int) tiles.get(i).getRectangle().getHeight() + 1, BufferedImage.TYPE_BYTE_GRAY);
 
-			Point p = it.next();
-			image.setRGB(p.x, p.y, Color.BLACK.getRGB());
-			while (it.hasNext()) {
-				p = it.next();
-				image.setRGB(p.x, p.y, Color.BLACK.getRGB());
+			for (int l = 0; l < image.getHeight(); l++) {
+				for (int m = 0; m < image.getWidth(); m++) {
+					image.setRGB(m, l, Color.WHITE.getRGB());
+
+				}
+
 			}
+
+			for (Point p : tiles.get(i).getMask().getPoints())
+				image.setRGB(p.x - tiles.get(i).getRectangle().getLocation().x, p.y - tiles.get(i).getRectangle().getLocation().y, Color.BLACK.getRGB());
+
+			PrintWriter writer = null;
+
+			try {
+				writer = new PrintWriter("hold.out", "UTF-8");
+
+			} catch (UnsupportedEncodingException | FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			// for (int l = tiles.get(i).getLocation().y; l <
+			// tiles.get(i).getHeight() + tiles.get(i).getLocation().y; l++) {
+			// for (int m = tiles.get(i).getLocation().x; m <
+			// tiles.get(i).getWidth() + tiles.get(i).getLocation().x; m++) {
+			// image.setRGB(m - tiles.get(i).getLocation().x, l -
+			// tiles.get(i).getLocation().y, pixels[l][m]);
+			// writer.write(StringUtils.center(String.valueOf(pixels[l][m]),
+			// 3));
+			// }
+			// writer.write("\n");
+			// }
+
+			writer.close();
 
 			try {
 				ImageIO.write(image, "png", new File(i + ".png"));
@@ -163,8 +246,25 @@ public class CharExtract {
 				e.printStackTrace();
 			}
 
+			// orig = picture.getImage();
+			//
+			// Graphics g = orig.getGraphics();
+			//
+			// g.setColor(Color.RED);
+			//
+			// g.drawRect(tiles.get(i).getRectangle().getLocation().x,
+			// tiles.get(i).getRectangle().getLocation().y, (int)
+			// tiles.get(i).getRectangle().getWidth(), (int)
+			// tiles.get(i).getRectangle().getHeight());
+			//
+			// try {
+			// ImageIO.write(orig, "png", new File("traced" + ".png"));
+			// } catch (IOException e) {
+			// // TODO Auto-generated catch block
+			// e.printStackTrace();
+			// }
+
 		}
 
 	}
-
 }
