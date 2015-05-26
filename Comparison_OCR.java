@@ -16,6 +16,13 @@ public class Comparison_OCR {
 		setLookandFeel();
 		GUI window = new GUI();
 		window.toggleVisibility();
+
+		// try {
+		// CharExtract ce = new CharExtract(new File("rsz_a.png"));
+		// } catch (IOException e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// }
 	}
 
 	/**

@@ -1,9 +1,14 @@
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 
 import javax.imageio.ImageIO;
+
+import org.apache.commons.lang3.StringUtils;
 
 public class Picture {
 
@@ -19,6 +24,14 @@ public class Picture {
 	 */
 	public Picture(String name) throws IOException {
 		image = ImageIO.read(new File(name));
+	}
+
+	public BufferedImage getImage() {
+		return image;
+	}
+
+	public void setImage(BufferedImage image) {
+		this.image = image;
 	}
 
 	/**
@@ -75,9 +88,51 @@ public class Picture {
 			for (int j = 0; j < image.getWidth(); j++) {
 				int clr = image.getRGB(i, j);
 				int red = (clr & 0x00ff0000) >> 16;
-			int green = (clr & 0x0000ff00) >> 8;
+				int green = (clr & 0x0000ff00) >> 8;
 				int blue = clr & 0x000000ff;
 				pixels[i][j] = (red + green + blue) / 3;
+			}
+		}
+
+		return pixels;
+	}
+
+	public int[][] getGrayscaleSimplest() {
+		final int[][] pixels = new int[image.getHeight()][image.getWidth()];
+
+		PrintWriter writer = null;
+
+		try {
+			writer = new PrintWriter("hold.out", "UTF-8");
+
+		} catch (UnsupportedEncodingException | FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		for (int i = 0; i < image.getHeight(); i++) {
+			for (int j = 0; j < image.getWidth(); j++) {
+				pixels[i][j] = image.getRGB(j, i) & 0xFF;
+				writer.write(StringUtils.center(String.valueOf(pixels[i][j]), 5));
+			}
+			writer.write("\n");
+		}
+
+		writer.close();
+
+		return pixels;
+	}
+
+	public int[][] getBlackAndWhite() {
+		final int[][] pixels = new int[image.getHeight()][image.getWidth()];
+
+		for (int i = 0; i < image.getHeight(); i++) {
+			for (int j = 0; j < image.getWidth(); j++) {
+				pixels[i][j] = image.getRGB(j, i) & 0xFF;
+				if (pixels[i][j] > 30)
+					pixels[i][j] = 255;
+				else
+					pixels[i][j] = 0;
 			}
 		}
 

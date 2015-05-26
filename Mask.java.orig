@@ -134,6 +134,7 @@ public class Mask {
 	/**
 	 * Return a rectangle for the tile
 	 */
+<<<<<<< HEAD
 	public Rectangle getTile() {
 		Iterator<Point> pIterator = points.iterator();
 		Point p = pIterator.next();
@@ -156,6 +157,7 @@ public class Mask {
 		}
 		return new Rectangle(x, y, x1-x, y1-y);
 	}
+=======
 	/*
 	 * public Rectangle getTile() { // Iterator<Point> pIterator =
 	 * points.iterator(); // Point p = pIterator.next(); // int x = p.x, x1 =
@@ -164,5 +166,6 @@ public class Mask {
 	 * // y1 = p.y; // } // if (p.x < x) { // x = p.x; // } // if (p.y < y) { //
 	 * y = p.y; // } // } }
 	 */
+>>>>>>> Working-Capture-Plus-File-Save
 
 }

@@ -1,11 +1,17 @@
 import java.awt.Point;
 import java.awt.Rectangle;
 
+<<<<<<< HEAD
+public class Tile extends Rectangle implements Comparable {
+
+	private Mask mask;
+	private int row;
+=======
 public class Tile {
 
 	private Mask mask;
 	private Rectangle rectangle;
-	private int row;
+>>>>>>> Working-Capture-Plus-File-Save
 
 	public Tile(Mask m) {
 		mask = m;
@@ -23,14 +29,6 @@ public class Tile {
 
 	}
 
-	public int getRow() {
-		return row;
-	}
-
-	public void setRow(int row) {
-		this.row = row;
-	}
-
 	public Rectangle getRectangle() {
 		return rectangle;
 	}
@@ -41,6 +39,14 @@ public class Tile {
 
 	public Rectangle getRectangle(Mask m) {
 		return new Rectangle();
+	}
+
+	public int getRow() {
+		return row;
+	}
+
+	public void setRow(int row) {
+		this.row = row;
 	}
 
 	public Mask getMask() {
