@@ -7,8 +7,11 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+<<<<<<< HEAD
 import java.util.Collections;
 import java.util.Iterator;
+=======
+>>>>>>> Working-Capture-Plus-File-Save
 
 import javax.imageio.ImageIO;
 
@@ -41,6 +44,11 @@ public class CharExtract {
 	public void createTiles() {
 		tiles = new ArrayList<Tile>();
 
+<<<<<<< HEAD
+		int[][] pixels = picture.getGrayscaleSimple();
+		double t = getThreshold(pixels);
+		// double t = 50;
+=======
 		// pixels = picture.getGrayscaleSimplest();
 		pixels = picture.getGrayscaleSimplest();
 
@@ -56,6 +64,7 @@ public class CharExtract {
 
 		// double t = getThreshold(pixels);
 		double t = 30;
+>>>>>>> Working-Capture-Plus-File-Save
 
 		// creating masks associated with tiles, adding to tiles ArrayList
 		for (int row = 0; row < pixels.length; row++) {
