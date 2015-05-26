@@ -1,7 +1,7 @@
 import java.awt.Point;
 import java.awt.Rectangle;
 
-public class Tile extends Comparable{
+public class Tile implements Comparable{
 
 	private Mask mask;
 	private Rectangle rectangle;
@@ -55,11 +55,11 @@ public class Tile extends Comparable{
 	public int compareTo(Object o) {
 		if( o instanceof Tile )
 		{
-			if( ((Tile) o).height + ((Tile) o).y != this.height + this.y )
+			if( ((Tile) o).getRectangle().height + ((Tile) o).getRectangle().y != rectangle.height + rectangle.y )
 			{
-				return (int) (((Tile) o).height+((Tile) o).y - (this.height + this.y));
+				return (int) (((Tile) o).getRectangle().height+((Tile) o).getRectangle().y - (rectangle.height + rectangle.y));
 			}
-			return (int) (((Tile) o).width + ((Tile) o).x - (this.width + this.x));
+			return (int) (((Tile) o).getRectangle().width + ((Tile) o).getRectangle().x - (rectangle.width + rectangle.x));
 		}
 		return 0;
 	}

@@ -131,9 +131,10 @@ public class Mask {
 		}
 	}
 
-	/**
+	/*
+	
 	 * Return a rectangle for the tile
-	 */
+	 
 	public Rectangle getTile() {
 		Iterator<Point> pIterator = points.iterator();
 		Point p = pIterator.next();
@@ -156,6 +157,9 @@ public class Mask {
 		}
 		return new Rectangle(x, y, x1-x, y1-y);
 	}
+	*/
+	
+	
 	/*
 	 * public Rectangle getTile() { // Iterator<Point> pIterator =
 	 * points.iterator(); // Point p = pIterator.next(); // int x = p.x, x1 =
