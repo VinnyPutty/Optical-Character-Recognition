@@ -1,7 +1,7 @@
 import java.awt.Point;
 import java.awt.Rectangle;
 
-public class Tile {
+public class Tile extends Comparable{
 
 	private Mask mask;
 	private Rectangle rectangle;
