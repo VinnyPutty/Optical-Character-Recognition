@@ -1,7 +1,12 @@
+import java.awt.Color;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 
-public class Tile implements Comparable{
+import org.imgscalr.Scalr;
+
+public class Tile implements Comparable<Tile> {
 
 	private Mask mask;
 	private Rectangle rectangle;
@@ -51,17 +56,52 @@ public class Tile implements Comparable{
 		this.mask = mask;
 	}
 
-	@Override
-	public int compareTo(Object o) {
-		if( o instanceof Tile )
-		{
-			if( ((Tile) o).getRectangle().height + ((Tile) o).getRectangle().y != rectangle.height + rectangle.y )
-			{
-				return (int) (((Tile) o).getRectangle().height+((Tile) o).getRectangle().y - (rectangle.height + rectangle.y));
+	public int fetchConfidence(String file, int[][] pixels) {
+		BufferedImage image = new BufferedImage(rectangle.width + 1, rectangle.height + 1, BufferedImage.TYPE_BYTE_GRAY);
+
+		for (int l = 0; l < image.getHeight(); l++) {
+			for (int m = 0; m < image.getWidth(); m++) {
+				image.setRGB(m, l, Color.WHITE.getRGB());
+
 			}
-			return (int) (((Tile) o).getRectangle().width + ((Tile) o).getRectangle().x - (rectangle.width + rectangle.x));
+
 		}
-		return 0;
+
+		for (Point p : mask.getPoints())
+			image.setRGB(p.x - rectangle.x, p.y - rectangle.y, Color.BLACK.getRGB());
+
+		Picture character = null;
+		Picture thisTile = null;
+		try {
+			character = new Picture(file);
+			image = Scalr.resize(image, character.getImage().getWidth(), character.getImage().getHeight());
+			thisTile = new Picture(image);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		int confidence = 0;
+		int[][] charPixels = character.getGrayscaleSimplest();
+		int[][] tilePixels = thisTile.getGrayscaleSimplest();
+
+		System.out.print("||" + charPixels[0].length + " " + tilePixels[0].length + "|| ");
+
+		if (charPixels[0].length == tilePixels[0].length && charPixels.length == tilePixels.length) {
+			for (int x = 0; x < charPixels[0].length; x++) {
+				for (int y = 0; y < charPixels.length; y++) {
+					confidence += Math.abs(tilePixels[y][x] - charPixels[y][x]);
+				}
+			}
+			return confidence;
+		}
+
+		return Integer.MAX_VALUE - 1;
 	}
 
+	@Override
+	public int compareTo(Tile o) {
+		if (o.getRectangle().height + o.getRectangle().y != rectangle.height + rectangle.y) return o.getRectangle().height + o.getRectangle().y - (rectangle.height + rectangle.y);
+		return o.getRectangle().width + o.getRectangle().x - (rectangle.width + rectangle.x);
+	}
 }
