@@ -26,6 +26,10 @@ public class Picture {
 		image = ImageIO.read(new File(name));
 	}
 
+	public Picture(BufferedImage image) throws IOException {
+		this.image = image;
+	}
+
 	public BufferedImage getImage() {
 		return image;
 	}

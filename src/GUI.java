@@ -14,6 +14,7 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
@@ -35,8 +36,12 @@ public class GUI {
 	/** The image loc. */
 	private JTextField imageLoc;
 
+	private File defaultImageLoc;
+
 	/** The output dir. */
 	private JTextField outputDir;
+
+	private File defaultOutDir;
 
 	/** The pixel size. */
 	private JTextField pixelSize;
@@ -93,6 +98,8 @@ public class GUI {
 		imageLoc = new JTextField(40);
 		imageSel.add(imageLoc);
 
+		defaultImageLoc = new File(imageLoc.getText());
+
 		JButton button = new JButton("Select");
 		button.addActionListener(getImageSelectAction());
 		imageSel.add(button);
@@ -117,6 +124,8 @@ public class GUI {
 		outputDir = new JTextField(40);
 		dirSelectPanel.add(outputDir);
 
+		defaultOutDir = new File(outputDir.getText());
+
 		JButton button = new JButton("Select");
 		button.addActionListener(getOutDirSelectAction());
 		dirSelectPanel.add(button);
@@ -132,16 +141,32 @@ public class GUI {
 	 */
 	private JPanel getPixelSizeSelectionPanel() {
 		JPanel panel = new JPanel();
-		panel.setLayout(new FlowLayout(FlowLayout.LEFT));
+		// panel.setLayout(new FlowLayout(FlowLayout.LEFT));
+		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 
-		panel.add(new JLabel("Select Output Character Size In Pixels: "));
+		panel.add(new JLabel("Select Output Character Size In Pixels (0 is default): "));
 
 		pixelSize = new JTextField(5);
-		pixelSize.setText("75");
+		pixelSize.setText("0");
+		pixelSize.addActionListener(getPixelSizeAction());
 		panel.add(pixelSize);
 		panel.setAlignmentY(Component.RIGHT_ALIGNMENT);
 
+		panel.add(getExtractButton());
+
 		return panel;
+	}
+
+	private JPanel getExtractButton() {
+		JPanel btnPanel = new JPanel();
+		btnPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
+
+		JButton btn = new JButton("Extract Characters");
+		btn.addActionListener(getExtractAction());
+
+		btnPanel.add(btn);
+
+		return btnPanel;
 	}
 
 	/**
@@ -162,14 +187,16 @@ public class GUI {
 					imageLoc.setText(chooser.getSelectedFile().getAbsolutePath());
 				}
 
-				if (!imageLoc.getText().equals(null)) {
-					try {
-						CharExtract ce = new CharExtract(new File(imageLoc.getText()));
-					} catch (IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-				}
+				// if (!imageLoc.getText().equals(null)) {
+				// try {
+				// CharExtract ce = new CharExtract(new
+				// File(imageLoc.getText()),
+				// Integer.parseInt(pixelSize.getText()));
+				// } catch (IOException e1) {
+				// // TODO Auto-generated catch block
+				// e1.printStackTrace();
+				// }
+				// }
 			}
 		};
 	}
@@ -193,6 +220,64 @@ public class GUI {
 				}
 			}
 		};
+	}
+
+	private ActionListener getExtractAction() {
+		return new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				boolean isOk = true;
+				int std_size = -1;
+				File imageFile = new File(imageLoc.getText());
+				File outDir = new File(outputDir.getText());
+
+				if (!imageFile.equals(defaultImageLoc) && !imageFile.exists()) {
+					JOptionPane.showMessageDialog(null, "Check image directory!");
+					isOk = false;
+				}
+
+				if (!outDir.equals(defaultOutDir) && !outDir.exists()) {
+					JOptionPane.showMessageDialog(null, "Check output directory!");
+					isOk = false;
+				}
+
+				try {
+					std_size = Integer.parseInt(pixelSize.getText());
+				} catch (Exception err) {
+					JOptionPane.showMessageDialog(null, "Input valid size in pixels!");
+					isOk = false;
+				}
+
+				if (isOk) {
+					try {
+						if (imageFile.equals(defaultImageLoc)) imageLoc.setText("/Users/V/Documents/workspace/Comparison OCR/Comfortaa.png");
+						Thread.sleep(10);
+						CharExtract ce = new CharExtract(new File(imageLoc.getText()), Integer.parseInt(pixelSize.getText()));
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (InterruptedException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					JOptionPane.showMessageDialog(null, "Complete.");
+				}
+			}
+		};
+	}
+
+	private ActionListener getPixelSizeAction() {
+		return new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (pixelSize.getText().equals("0")) {
+					pixelSize.setText(null);
+				}
+			}
+		};
+
 	}
 
 	/**

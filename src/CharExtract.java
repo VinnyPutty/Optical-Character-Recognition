@@ -19,6 +19,8 @@ public class CharExtract {
 	private ArrayList<Tile> tiles;
 	private Picture picture;
 	private int[][] pixels;
+	private int height;
+	private char[] letters = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' };
 
 	/**
 	 * Instantiates a new char extract.
@@ -28,10 +30,12 @@ public class CharExtract {
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
-	public CharExtract(File img) throws IOException {
+	public CharExtract(File img, int height) throws IOException {
 		picture = new Picture(img.getAbsolutePath());
+		this.height = height;
 		createTiles();
-		tileSave();
+		charExtract();
+		// tileSave();
 		System.out.println("Complete.");
 	}
 
@@ -41,8 +45,8 @@ public class CharExtract {
 	public void createTiles() {
 		tiles = new ArrayList<Tile>();
 
-		// pixels = picture.getGrayscaleSimplest();
 		pixels = picture.getGrayscaleSimplest();
+		// pixels = picture.getBlackAndWhite();
 
 		// int sum = 0;
 		//
@@ -120,7 +124,7 @@ public class CharExtract {
 	private boolean withinTiles(int row, int col) {
 
 		for (Tile t : tiles) {
-			if ((t.getRectangle().getLocation().x <= col && col <= t.getRectangle().getWidth() + t.getRectangle().getLocation().x) && (t.getRectangle().getLocation().y <= row && row <= t.getRectangle().getHeight() + t.getRectangle().getLocation().y)) return true;
+			if ((t.getRectangle().x <= col && col <= t.getRectangle().width + t.getRectangle().x) && (t.getRectangle().y <= row && row <= t.getRectangle().height + t.getRectangle().y)) return true;
 		}
 		return false;
 	}
@@ -191,37 +195,52 @@ public class CharExtract {
 	// create strings from tiles
 	public String charBuilder() {
 		// sort tiles
-		Collections.sort( tiles );
+		Collections.sort(tiles);
 		checkIJ();
-		
+
 		// build char
-		StringBuilder s = new StringBuilder();
-		
-		Iterator tileIterator = tiles.iterator();
-		Tile tile = (Tile) tileIterator.next();
-		
-		while( tileIterator.hasNext() )
-		{
-			s.append( charExtract( tile ) );
-		}
+		return charExtract();
 
-		return s.toString();
 	}
 
-	private void checkIJ()
-	{
-		Iterator tileIterator = tiles.iterator();
-		Tile tile = (Tile) tileIterator.next();
-		
-		while( tileIterator.hasNext() )
-		{
-			
+	private void checkIJ() {
+		Iterator<Tile> tileIterator = tiles.iterator();
+		Tile tile = tileIterator.next();
+
+		while (tileIterator.hasNext()) {
+
 		}
 	}
-	
-	private char charExtract(Tile t) {
 
-		return ' ';
+	private String charExtract() {
+		PrintWriter out = null;
+		PrintWriter conf = null;
+		String s = null;
+		int letter = -1;
+		int confidence = Integer.MAX_VALUE;
+		try {
+			out = new PrintWriter("output.txt");
+			for (Tile t : tiles) {
+				for (int i = 0; i < 26; i++) {
+					if (t.fetchConfidence(i + ".png", pixels) < confidence) {
+						confidence = t.fetchConfidence(i + ".png", pixels);
+						System.out.print(confidence + " ");
+						letter = i;
+					}
+				}
+				out.write(letters[letter]);
+				s = s + letters[letter];
+				System.out.println(letter + " ");
+				confidence = Integer.MAX_VALUE;
+				letter = -1;
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+
+		out.close();
+
+		return s;
 	}
 
 	private void tileSave() {
@@ -267,7 +286,7 @@ public class CharExtract {
 
 			writer.close();
 
-			image = Scalr.resize(image, 100);
+			if (height > 0) image = Scalr.resize(image, height);
 
 			try {
 				ImageIO.write(image, "png", new File(i + ".png"));
