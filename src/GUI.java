@@ -153,6 +153,7 @@ public class GUI {
 		panel.setAlignmentY(Component.RIGHT_ALIGNMENT);
 
 		panel.add(getExtractButton());
+		panel.add(getSaveButton());
 
 		return panel;
 	}
@@ -163,6 +164,18 @@ public class GUI {
 
 		JButton btn = new JButton("Extract Characters");
 		btn.addActionListener(getExtractAction());
+
+		btnPanel.add(btn);
+
+		return btnPanel;
+	}
+
+	private JPanel getSaveButton() {
+		JPanel btnPanel = new JPanel();
+		btnPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
+
+		JButton btn = new JButton("Save Characters");
+		btn.addActionListener(getSaveAction());
 
 		btnPanel.add(btn);
 
@@ -251,9 +264,10 @@ public class GUI {
 
 				if (isOk) {
 					try {
-						if (imageFile.equals(defaultImageLoc)) imageLoc.setText("/Users/V/Documents/workspace/Comparison OCR/Comfortaa.png");
+						if (imageFile.equals(defaultImageLoc)) imageLoc.setText("/Users/V/Documents/workspace/Comparison OCR/ComfortaaSmall.png");
 						Thread.sleep(10);
 						CharExtract ce = new CharExtract(new File(imageLoc.getText()), Integer.parseInt(pixelSize.getText()));
+						ce.charExtract();
 					} catch (IOException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
@@ -261,7 +275,53 @@ public class GUI {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
-					JOptionPane.showMessageDialog(null, "Complete.");
+					JOptionPane.showMessageDialog(null, "Extraction Complete.");
+				}
+			}
+		};
+	}
+
+	private ActionListener getSaveAction() {
+		return new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				boolean isOk = true;
+				int std_size = -1;
+				File imageFile = new File(imageLoc.getText());
+				File outDir = new File(outputDir.getText());
+
+				if (!imageFile.equals(defaultImageLoc) && !imageFile.exists()) {
+					JOptionPane.showMessageDialog(null, "Check image directory!");
+					isOk = false;
+				}
+
+				if (!outDir.equals(defaultOutDir) && !outDir.exists()) {
+					JOptionPane.showMessageDialog(null, "Check output directory!");
+					isOk = false;
+				}
+
+				try {
+					std_size = Integer.parseInt(pixelSize.getText());
+				} catch (Exception err) {
+					JOptionPane.showMessageDialog(null, "Input valid size in pixels!");
+					isOk = false;
+				}
+
+				if (isOk) {
+					try {
+						if (imageFile.equals(defaultImageLoc)) imageLoc.setText("/Users/V/Documents/workspace/Comparison OCR/ComfortaaSmall.png");
+						Thread.sleep(10);
+						CharExtract ce = new CharExtract(new File(imageLoc.getText()), Integer.parseInt(pixelSize.getText()));
+						ce.tileSave();
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (InterruptedException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					JOptionPane.showMessageDialog(null, "Save Complete.");
 				}
 			}
 		};

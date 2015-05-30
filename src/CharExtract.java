@@ -34,7 +34,7 @@ public class CharExtract {
 		picture = new Picture(img.getAbsolutePath());
 		this.height = height;
 		createTiles();
-		charExtract();
+		// charExtract();
 		// tileSave();
 		System.out.println("Complete.");
 	}
@@ -45,8 +45,8 @@ public class CharExtract {
 	public void createTiles() {
 		tiles = new ArrayList<Tile>();
 
-		pixels = picture.getGrayscaleSimplest();
-		// pixels = picture.getBlackAndWhite();
+		// pixels = picture.getGrayscaleSimplest();
+		pixels = picture.getBlackAndWhite();
 
 		// int sum = 0;
 		//
@@ -212,7 +212,7 @@ public class CharExtract {
 		}
 	}
 
-	private String charExtract() {
+	public String charExtract() {
 		PrintWriter out = null;
 		PrintWriter conf = null;
 		String s = null;
@@ -243,7 +243,7 @@ public class CharExtract {
 		return s;
 	}
 
-	private void tileSave() {
+	public void tileSave() {
 
 		BufferedImage orig = null;
 
