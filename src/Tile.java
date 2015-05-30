@@ -74,7 +74,10 @@ public class Tile implements Comparable<Tile> {
 		Picture thisTile = null;
 		try {
 			character = new Picture(file);
-			image = Scalr.resize(image, character.getImage().getWidth(), character.getImage().getHeight());
+			if (character.getImage().getHeight() >= character.getImage().getWidth())
+				image = Scalr.resize(image, character.getImage().getHeight());
+			else
+				image = Scalr.resize(image, character.getImage().getWidth(), character.getImage().getHeight());
 			thisTile = new Picture(image);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -82,8 +85,11 @@ public class Tile implements Comparable<Tile> {
 		}
 
 		int confidence = 0;
-		int[][] charPixels = character.getGrayscaleSimplest();
-		int[][] tilePixels = thisTile.getGrayscaleSimplest();
+		// int[][] charPixels = character.getGrayscaleSimplest();
+		// int[][] tilePixels = thisTile.getGrayscaleSimplest();
+
+		int[][] charPixels = character.getBlackAndWhite();
+		int[][] tilePixels = thisTile.getBlackAndWhite();
 
 		System.out.print("||" + charPixels[0].length + " " + tilePixels[0].length + "|| ");
 

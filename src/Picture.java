@@ -92,7 +92,7 @@ public class Picture {
 			for (int j = 0; j < image.getWidth(); j++) {
 				int clr = image.getRGB(i, j);
 				int red = (clr & 0x00ff0000) >> 16;
-				int green = (clr & 0x0000ff00) >> 8;
+			int green = (clr & 0x0000ff00) >> 8;
 				int blue = clr & 0x000000ff;
 				pixels[i][j] = (red + green + blue) / 3;
 			}
@@ -130,6 +130,16 @@ public class Picture {
 	public int[][] getBlackAndWhite() {
 		final int[][] pixels = new int[image.getHeight()][image.getWidth()];
 
+		PrintWriter writer = null;
+
+		try {
+			writer = new PrintWriter("hold.out", "UTF-8");
+
+		} catch (UnsupportedEncodingException | FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 		for (int i = 0; i < image.getHeight(); i++) {
 			for (int j = 0; j < image.getWidth(); j++) {
 				pixels[i][j] = image.getRGB(j, i) & 0xFF;
@@ -137,8 +147,12 @@ public class Picture {
 					pixels[i][j] = 255;
 				else
 					pixels[i][j] = 0;
+				writer.write(StringUtils.center(String.valueOf(pixels[i][j]), 5));
 			}
+			writer.write("\n");
 		}
+
+		writer.close();
 
 		return pixels;
 	}
