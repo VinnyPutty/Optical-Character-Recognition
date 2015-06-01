@@ -21,6 +21,7 @@ public class CharExtract {
 	private int[][] pixels;
 	private int height;
 	private char[] letters = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' };
+	public static double t = 255;
 
 	/**
 	 * Instantiates a new char extract.
@@ -39,14 +40,21 @@ public class CharExtract {
 		System.out.println("Complete.");
 	}
 
+	public void checkInputImageSize() {
+		if (picture.getImage().getHeight() < 1000 || picture.getImage().getWidth() < 1000) picture.setImage(Scalr.resize(picture.getImage(), Scalr.Method.ULTRA_QUALITY, 1000));
+	}
+
 	/**
 	 * Creates the tiles.
 	 */
 	public void createTiles() {
 		tiles = new ArrayList<Tile>();
 
+		// double t = getThreshold(pixels);
+		t = 75;
+
 		// pixels = picture.getGrayscaleSimplest();
-		pixels = picture.getBlackAndWhite();
+		pixels = picture.getBlackAndWhite(t);
 
 		// int sum = 0;
 		//
@@ -57,9 +65,6 @@ public class CharExtract {
 		// }
 
 		// System.out.println(sum);
-
-		// double t = getThreshold(pixels);
-		double t = 30;
 
 		// creating masks associated with tiles, adding to tiles ArrayList
 		for (int row = 0; row < pixels.length; row++) {
@@ -213,6 +218,7 @@ public class CharExtract {
 	}
 
 	public String charExtract() {
+		ArrayList<Character> chars = new ArrayList<Character>();
 		PrintWriter out = null;
 		PrintWriter conf = null;
 		String s = null;
@@ -221,18 +227,43 @@ public class CharExtract {
 		try {
 			out = new PrintWriter("output.txt");
 			for (Tile t : tiles) {
+				// for (int i = 22; i < 26; i++) {
+				// if (t.fetchLineConfidence(i + ".png", pixels) < confidence) {
+				// confidence = t.fetchLineConfidence(i + ".png", pixels);
+				// System.out.print(confidence + " ");
+				// letter = i;
+				// }
+				// }
+				// for (int i = 0; i < 22; i++) {
+				// if (t.fetchLineConfidence(i + ".png", pixels) < confidence) {
+				// confidence = t.fetchLineConfidence(i + ".png", pixels);
+				// System.out.print(confidence + " ");
+				// letter = i;
+				// }
+				// }
 				for (int i = 0; i < 26; i++) {
-					if (t.fetchConfidence(i + ".png", pixels) < confidence) {
-						confidence = t.fetchConfidence(i + ".png", pixels);
+					if (t.fetchLineConfidence(i + ".png", pixels) < confidence) {
+						confidence = t.fetchLineConfidence(i + ".png", pixels);
 						System.out.print(confidence + " ");
 						letter = i;
 					}
 				}
-				out.write(letters[letter]);
+				// out.write(letters[letter]);
+				chars.add(letters[letter]);
 				s = s + letters[letter];
 				System.out.println(letter + " ");
 				confidence = Integer.MAX_VALUE;
 				letter = -1;
+			}
+
+			out.write(chars.get(0));
+
+			for (int i = 1; i < chars.size(); i++) {
+				if (tiles.get(i).compareTo(tiles.get(i - 1)) >= 1) {
+					out.write(' ');
+					System.out.println(tiles.get(i).compareTo(tiles.get(i - 1)));
+				}
+				out.write(chars.get(i));
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();

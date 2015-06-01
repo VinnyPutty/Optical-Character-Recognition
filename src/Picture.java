@@ -9,6 +9,7 @@ import java.io.UnsupportedEncodingException;
 import javax.imageio.ImageIO;
 
 import org.apache.commons.lang3.StringUtils;
+import org.imgscalr.Scalr;
 
 public class Picture {
 
@@ -92,7 +93,7 @@ public class Picture {
 			for (int j = 0; j < image.getWidth(); j++) {
 				int clr = image.getRGB(i, j);
 				int red = (clr & 0x00ff0000) >> 16;
-			int green = (clr & 0x0000ff00) >> 8;
+				int green = (clr & 0x0000ff00) >> 8;
 				int blue = clr & 0x000000ff;
 				pixels[i][j] = (red + green + blue) / 3;
 			}
@@ -127,7 +128,21 @@ public class Picture {
 		return pixels;
 	}
 
-	public int[][] getBlackAndWhite() {
+	public int[][] getGrayscaleScalr() {
+		BufferedImage grayscaleImage = Scalr.apply(image, Scalr.OP_GRAYSCALE);
+
+		final int[][] pixels = new int[grayscaleImage.getHeight()][grayscaleImage.getWidth()];
+
+		for (int i = 0; i < grayscaleImage.getHeight(); i++) {
+			for (int j = 0; j < grayscaleImage.getWidth(); j++) {
+				pixels[i][j] = grayscaleImage.getRGB(j, i);
+			}
+		}
+
+		return pixels;
+	}
+
+	public int[][] getBlackAndWhite(double t) {
 		final int[][] pixels = new int[image.getHeight()][image.getWidth()];
 
 		PrintWriter writer = null;
@@ -143,10 +158,8 @@ public class Picture {
 		for (int i = 0; i < image.getHeight(); i++) {
 			for (int j = 0; j < image.getWidth(); j++) {
 				pixels[i][j] = image.getRGB(j, i) & 0xFF;
-				if (pixels[i][j] > 30)
-					pixels[i][j] = 255;
-				else
-					pixels[i][j] = 0;
+				if (pixels[i][j] > t) pixels[i][j] = 255;
+				else pixels[i][j] = 0;
 				writer.write(StringUtils.center(String.valueOf(pixels[i][j]), 5));
 			}
 			writer.write("\n");
