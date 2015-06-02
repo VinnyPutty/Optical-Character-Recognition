@@ -1,6 +1,8 @@
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 
 public class Mask {
@@ -10,6 +12,7 @@ public class Mask {
 
 	private double threshold;
 	private List<Point> points;
+	private List<Point> pointsAverage;
 
 	// direction arrays
 	private int[] dX = { -1, 0, 1 };
@@ -32,11 +35,38 @@ public class Mask {
 		y = row;
 		threshold = t;
 		dilateMask(pixels);
-		for (int i = 0; i < points.size(); i++) {
-			// System.out.println(points.get(i));
-		}
+
+		Collections.sort( points , new PointComparator() );
+		findPointsAverage();
 	}
 
+	private void findPointsAverage() {
+		pointsAverage = new ArrayList<Point>();
+		Iterator<Point> pIterator = points.iterator();
+		Point p = pIterator.next();
+		int y = p.y;
+		int xStart = p.x;
+		int xEnd = p.x;
+		while( pIterator.hasNext() )
+		{
+			p = pIterator.next();
+			while( p.y == y && p.x - 1 == xEnd )
+			{
+				xEnd = p.x;
+				if( pIterator.hasNext() )
+				{
+					p = pIterator.next();
+				}
+			}
+			pointsAverage.add( new Point( (xStart+xEnd) / 2 , y ) );
+			y = p.y;
+			xEnd = p.x;
+		}
+		
+	}
+
+
+	
 	/**
 	 * Dilate mask.
 	 *
@@ -94,6 +124,15 @@ public class Mask {
 		this.points = points;
 	}
 
+	public double getThreshold() {
+		return threshold;
+	}
+
+	public void setThreshold(double threshold) {
+		this.threshold = threshold;
+	}
+
+	
 	/**
 	 * Find surrounding pixels of the Set of points
 	 */
@@ -122,31 +161,58 @@ public class Mask {
 		// pixels[p.y - 1][p.x] <= threshold) points.add(new Point(p.x, p.y -
 		// 1));
 		// }
-
+		/*
 		for (int i = 0; i < points.size(); i++) {
 			if (points.get(i).x + 1 < pixels[0].length && !points.contains(new Point(points.get(i).x + 1, points.get(i).y)) && pixels[points.get(i).y][points.get(i).x + 1] <= threshold) points.add(new Point(points.get(i).x + 1, points.get(i).y));
 			if (points.get(i).x - 1 >= 0 && !points.contains(new Point(points.get(i).x - 1, points.get(i).y)) && pixels[points.get(i).y][points.get(i).x - 1] <= threshold) points.add(new Point(points.get(i).x - 1, points.get(i).y));
 			if (points.get(i).y + 1 < pixels.length && !points.contains(new Point(points.get(i).x, points.get(i).y + 1)) && pixels[points.get(i).y + 1][points.get(i).x] <= threshold) points.add(new Point(points.get(i).x, points.get(i).y + 1));
 			if (points.get(i).y - 1 >= 0 && !points.contains(new Point(points.get(i).x, points.get(i).y - 1)) && pixels[points.get(i).y - 1][points.get(i).x] <= threshold) points.add(new Point(points.get(i).x, points.get(i).y - 1));
 		}
+		*/
+		
+		int x = points.size();
+		for( int i = 0; i < x; i++ )
+		{
+			for( int j = 0; j < 3; j++ )
+			{
+				for( int k = 0; k < 3; k++ )
+				{
+					Point p = points.get(i);
+					Point p1 = new Point( p.x + dX[j] , p.y + dY[k] );
+					if( insideArray( p1 , pixels ) && !points.contains(p1) && pixels[p1.y][p1.x] <= threshold )
+					{
+						points.add( p1 );
+					}
+				}
+			}
+		}
+		
 	}
 
-	/*
-	 * Return a rectangle for the tile public Rectangle getTile() {
-	 * Iterator<Point> pIterator = points.iterator(); Point p =
-	 * pIterator.next(); int x = p.x, x1 = p.x; int y = p.y, y1 = p.y; while
-	 * (pIterator.hasNext()) { p = pIterator.next(); if (p.x > x1) { x1 = p.x; }
-	 * if (p.y > y1) { y1 = p.y; } if (p.x < x) { x = p.x; } if (p.y < y) { y =
-	 * p.y; } } return new Rectangle(x, y, x1-x, y1-y); }
-	 */
+	private boolean insideArray( Point p , int[][] a )
+	{
+		return p.x >= 0 && p.x < a[0].length && p.y >= 0 && p.y < a.length;
+	}
+	
+	public List<Point> getPointsAverage() {
+		return pointsAverage;
+	}
 
-	/*
-	 * public Rectangle getTile() { // Iterator<Point> pIterator =
-	 * points.iterator(); // Point p = pIterator.next(); // int x = p.x, x1 =
-	 * p.x; // int y = p.y, y1 = p.y; // while (pIterator.hasNext()) { // p =
-	 * pIterator.next(); // if (p.x > x1) { // x1 = p.x; // } // if (p.y > y1) {
-	 * // y1 = p.y; // } // if (p.x < x) { // x = p.x; // } // if (p.y < y) { //
-	 * y = p.y; // } // } }
-	 */
+	public void setPointsAverage(List<Point> pointAverage) {
+		this.pointsAverage = pointAverage;
+	}
 
+}
+
+class PointComparator implements Comparator<Point> {
+
+	@Override
+	public int compare(Point p1, Point p2) {
+		if( p1.y != p2.y )
+		{
+			return p1.y - p2.y;
+		}
+		return p1.x - p2.x;
+	}
+	
 }

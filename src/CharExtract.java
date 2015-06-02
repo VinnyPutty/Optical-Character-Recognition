@@ -30,13 +30,13 @@ public class CharExtract {
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
-	public CharExtract(File img, int height) throws IOException {
+	public CharExtract(File img, int h) throws IOException {
 		picture = new Picture(img.getAbsolutePath());
-		this.height = height;
+		height = h;
 		createTiles();
-		// charExtract();
-		// tileSave();
-		System.out.println("Complete.");
+		// String s = charBuilder();
+		//tileSave();
+		System.out.println("Complete. ");
 	}
 
 	/**
@@ -46,70 +46,25 @@ public class CharExtract {
 		tiles = new ArrayList<Tile>();
 
 		// pixels = picture.getGrayscaleSimplest();
-		pixels = picture.getBlackAndWhite();
+		pixels = picture.getGrayscaleSimplest();
 
-		// int sum = 0;
-		//
-		// for (int[] i : pixels) {
-		// for (int j : i) {
-		// if (j <= 30) sum++;
-		// }
-		// }
-
-		// System.out.println(sum);
-
-		// double t = getThreshold(pixels);
-		double t = 30;
+		double t = getThreshold(pixels);
+		//double t = 30;
 
 		// creating masks associated with tiles, adding to tiles ArrayList
 		for (int row = 0; row < pixels.length; row++) {
 			for (int col = 0; col < pixels[row].length; col++) {
-
-				if (pixels[row][col] <= t && !withinTiles(row, col)) {
-
+				if (pixels[row][col] <= t && !withinTiles(row, col)) 
+				{
+					//System.out.print( "Tile found " );
+					//long startTime = System.currentTimeMillis();
 					tiles.add(new Tile(new Mask(col, row, t, pixels)));
-
-					// System.out.flush();
-					//
-					// System.out.println(sum);
-					//
-					// for (Tile tile : tiles) {
-					// System.out.println(String.valueOf(tile.getRectangle().getLocation().x)
-					// + " " +
-					// String.valueOf(tile.getRectangle().getLocation().y) + " "
-					// + String.valueOf(tile.getRectangle().getLocation().x +
-					// (int) tile.getRectangle().getWidth()) + " " +
-					// String.valueOf(tile.getRectangle().getLocation().y +
-					// (int) tile.getRectangle().getHeight()) + " is tile #");
-					// }
-					//
-					// System.out.println(tiles.size());
-
-					// BufferedImage orig = picture.getImage();
-					//
-					// Graphics g = orig.getGraphics();
-					//
-					// g.setColor(Color.RED);
-					//
-					// g.drawRect(tiles.get(tiles.size() -
-					// 1).getRectangle().getLocation().x, tiles.get(tiles.size()
-					// - 1).getRectangle().getLocation().y, (int)
-					// tiles.get(tiles.size() - 1).getRectangle().getWidth(),
-					// (int) tiles.get(tiles.size() -
-					// 1).getRectangle().getHeight());
-					//
-					// try {
-					// ImageIO.write(orig, "png", new File("traced" +
-					// tiles.size() + ".png"));
-					// } catch (IOException e) {
-					// // TODO Auto-generated catch block
-					// e.printStackTrace();
-					// }
-
+					//long endTime = System.currentTimeMillis();
+					//System.out.println( "Tile done" + ( endTime - startTime ) );
 				}
 			}
 		}
-
+		
 	}
 
 	/**
@@ -122,7 +77,6 @@ public class CharExtract {
 	 * @return true, if successful
 	 */
 	private boolean withinTiles(int row, int col) {
-
 		for (Tile t : tiles) {
 			if ((t.getRectangle().x <= col && col <= t.getRectangle().width + t.getRectangle().x) && (t.getRectangle().y <= row && row <= t.getRectangle().height + t.getRectangle().y)) return true;
 		}
@@ -156,20 +110,20 @@ public class CharExtract {
 		// average intensity
 		int aMean = Math.round(partialArraySum(weight, 0, 255) / partialArraySum(bin, 0, 255));
 		// find means below and above the average intensity
-		double lMean = partialArraySum(weight, 0, aMean) / partialArraySum(bin, 0, 255);
-		double hMean = partialArraySum(weight, aMean, 0) / partialArraySum(bin, aMean, 0);
+		double lMean = partialArraySum(weight, 0, aMean) / partialArraySum(bin, 0, aMean);
+		double hMean = partialArraySum(weight, aMean, 255) / partialArraySum(bin, aMean, 255);
 		int temp = aMean;
 		aMean = (int) Math.round((lMean + hMean) / 2);
 
 		// iterate until upper and lower averages are the same
 		while (Math.abs(temp - aMean) >= 1) {
 			temp = aMean;
-			lMean = partialArraySum(weight, 0, aMean) / partialArraySum(bin, 0, 255);
-			hMean = partialArraySum(weight, aMean, 0) / partialArraySum(bin, aMean, 0);
+			lMean = partialArraySum(weight, 0, aMean) / partialArraySum(bin, 0, aMean);
+			hMean = partialArraySum(weight, aMean, 255) / partialArraySum(bin, aMean, 255);
 			aMean = (int) Math.round((lMean + hMean) / 2);
 		}
 		// calculate t from balanced intensity
-		t = (aMean - 1.0) / (256);
+		t = (aMean - 1.0);
 		return t;
 	}
 
@@ -195,23 +149,36 @@ public class CharExtract {
 	// create strings from tiles
 	public String charBuilder() {
 		// sort tiles
-		Collections.sort(tiles);
-		checkIJ();
-
+		Collections.sort( tiles );
+		// checkIJ();
+		
 		// build char
-		return charExtract();
-
-	}
-
-	private void checkIJ() {
+		StringBuilder s = new StringBuilder();
+		
 		Iterator<Tile> tileIterator = tiles.iterator();
-		Tile tile = tileIterator.next();
-
-		while (tileIterator.hasNext()) {
-
+		double v = Double.MAX_VALUE;
+		int letter = 0;
+		
+		// iterate through learned tiles, pick letter with least variance
+		while( tileIterator.hasNext() )
+		{
+			Tile tile = tileIterator.next();
+			for( int i = 0 ; i < 26 ; i++ )
+			{
+				System.out.println(i);
+				double x = tile.slopeVarianceLevel( i + ".png" , pixels );
+				if( x < v )
+				{
+					v = x;
+					letter = i;
+				}
+			}
+			s.append( letters[letter] );
 		}
-	}
 
+		return s.toString();
+	}
+	
 	public String charExtract() {
 		PrintWriter out = null;
 		PrintWriter conf = null;
@@ -243,6 +210,18 @@ public class CharExtract {
 		return s;
 	}
 
+	private void checkIJ()
+	{
+		Iterator<Tile> tileIterator = tiles.iterator();
+		Tile tile = tileIterator.next();
+		
+		while( tileIterator.hasNext() )
+		{
+			
+		}
+	}
+	
+
 	public void tileSave() {
 
 		BufferedImage orig = null;
@@ -268,49 +247,18 @@ public class CharExtract {
 				writer = new PrintWriter("hold.out", "UTF-8");
 
 			} catch (UnsupportedEncodingException | FileNotFoundException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
-			// for (int l = tiles.get(i).getLocation().y; l <
-			// tiles.get(i).getHeight() + tiles.get(i).getLocation().y; l++) {
-			// for (int m = tiles.get(i).getLocation().x; m <
-			// tiles.get(i).getWidth() + tiles.get(i).getLocation().x; m++) {
-			// image.setRGB(m - tiles.get(i).getLocation().x, l -
-			// tiles.get(i).getLocation().y, pixels[l][m]);
-			// writer.write(StringUtils.center(String.valueOf(pixels[l][m]),
-			// 3));
-			// }
-			// writer.write("\n");
-			// }
-
 			writer.close();
 
-			if (height > 0) image = Scalr.resize(image, height);
+			image = Scalr.resize(image, 100);
 
 			try {
 				ImageIO.write(image, "png", new File(i + ".png"));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-
-			// orig = picture.getImage();
-			//
-			// Graphics g = orig.getGraphics();
-			//
-			// g.setColor(Color.RED);
-			//
-			// g.drawRect(tiles.get(i).getRectangle().getLocation().x,
-			// tiles.get(i).getRectangle().getLocation().y, (int)
-			// tiles.get(i).getRectangle().getWidth(), (int)
-			// tiles.get(i).getRectangle().getHeight());
-			//
-			// try {
-			// ImageIO.write(orig, "png", new File("traced" + ".png"));
-			// } catch (IOException e) {
-			// // TODO Auto-generated catch block
-			// e.printStackTrace();
-			// }
 
 		}
 
